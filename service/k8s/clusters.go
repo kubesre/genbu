@@ -12,6 +12,7 @@ import (
 	"genbu/common/global"
 	dk "genbu/dao/k8s"
 	"genbu/models/k8s"
+	"genbu/utils"
 )
 
 // k8s 集群添加
@@ -34,5 +35,18 @@ func (k *k8sCluster) ListK8sCluster(name string, limit, page int) (clusters *k8s
 		global.TPLogger.Error("获取集群列表失败：", err)
 		return nil, errors.New("获取集群列表失败")
 	}
+	for _, item := range clusters.Items {
+		configStr := item.Text
+		decodeConfig, _ := utils.DecodeBase64(configStr)
+		_, err = global.NewClientInterface().NewClientSet(decodeConfig)
+		if err != nil {
+			item.Active = "down"
+		} else {
+			item.Active = "running"
+		}
+		item.Text = ""
+	}
 	return clusters, nil
 }
+
+// TODO 查看config文件

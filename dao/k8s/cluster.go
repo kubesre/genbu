@@ -46,7 +46,7 @@ func (k *k8sCluster) ListK8sCluster(name string, limit, page int) (clusters *k8s
 	// 定义分页起始位置
 	startSet := (page - 1) * limit
 	var (
-		K8sClusterList []k8s.Configs
+		K8sClusterList []*k8s.Configs
 		total          int64
 	)
 	if err = global.GORM.Model(&k8s.Configs{}).Where("name LIKE ?", "%"+name+"%").Count(&total).

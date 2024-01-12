@@ -8,7 +8,6 @@
 package v1
 
 import (
-	"genbu/controllers/users"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 )
@@ -17,10 +16,7 @@ import (
 
 func InitBaseRouters(r *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) gin.IRoutes {
 	{
-		r.POST("/login", authMiddleware.LoginHandler)     // 登录
-		r.POST("/logout", authMiddleware.LogoutHandler)   // 退出
-		r.POST("/refresh", authMiddleware.RefreshHandler) // 刷新令牌
-		r.POST("/register", users.Register)               // 注册
+		r.POST("/base/user/login", authMiddleware.LoginHandler) // 登录
 	}
 	return r
 }

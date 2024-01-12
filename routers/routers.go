@@ -45,12 +45,12 @@ func BaseRouters() *gin.Engine {
 		return
 	})
 	// 不需要做鉴权的接口 PublicGroup
-	PublicGroup := r.Group("/api/v1")
+	PublicGroup := r.Group("/api")
 	{
 		v1.InitBaseRouters(PublicGroup, authMiddleware)
 	}
 	// 需要做鉴权的接口
-	PrivateGroup := r.Group("/api/v1")
+	PrivateGroup := r.Group("/api")
 	// 鉴权
 	//PrivateGroup.Use(gin.Recovery()).
 	//	Use(middles.OperationLog()).Use(middles.CasbinMiddle())

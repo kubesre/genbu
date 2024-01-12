@@ -65,14 +65,15 @@ func DelPolicy(ctx *gin.Context) {
 
 func ListPolicy(ctx *gin.Context) {
 	params := new(struct {
-		Limit int `form:"limit"`
-		Page  int `form:"page"`
+		keyWord string `form:"keyword"`
+		Limit   int    `form:"limit"`
+		Page    int    `form:"page"`
 	})
 	if err := ctx.ShouldBindQuery(&params); err != nil {
 		global.TPLogger.Error("用户查询数据绑定失败：", err)
 		global.ReturnContext(ctx).Failed("failed", err)
 		return
 	}
-	data := casbin.NewCasbinInterface().ListPolicy(params.Limit, params.Page)
+	data := casbin.NewCasbinInterface().ListPolicy(params.keyWord, params.Limit, params.Page)
 	global.ReturnContext(ctx).Successful("success", data)
 }

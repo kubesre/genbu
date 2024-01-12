@@ -16,8 +16,8 @@ import (
 func InitMenusRouters(r *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) gin.IRoutes {
 	{
 		r.Use(authMiddleware.MiddlewareFunc())
-		r.POST("/menu/add", menu.AddMenus)
-		r.GET("/menu/list", menu.ListMenus)
+		r.POST("/menu/addMenu", menu.AddMenus)
+		r.GET("/menu/listMenu", menu.ListMenus)
 	}
 	return r
 }

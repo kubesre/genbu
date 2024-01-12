@@ -38,7 +38,8 @@ func (d *deptInfo) AddDept(dept *models.Dept) error {
 
 func (d *deptInfo) DeptList() ([]models.Dept, error) {
 	var depts []models.Dept
-	if err := global.GORM.Where("parent_id", 0).Find(&depts).Error; err != nil {
+	if err := global.GORM.Where("parent_id", 0).Preload("Users").Preload("Users.Role").
+		Preload("Users.Dept").Find(&depts).Error; err != nil {
 		return nil, err
 	}
 	for i := range depts {
@@ -88,14 +89,17 @@ func (d *deptInfo) DelDept(did int) error {
 // 定义一个函数用户查询部门以及子部门
 
 func childrenDept(dept *models.Dept) error {
-	if err := global.GORM.Where("parent_id", dept.ID).Preload("Users").Find(&dept.Children).Error; err != nil {
-		for i := range dept.Children {
-			err = childrenDept(dept.Children[i])
-			if err != nil {
-				return err
-			}
+	var children []*models.Dept
+	if err := global.GORM.Where("parent_id = ?", dept.ID).Preload("Users").Preload("Users.Role").
+		Preload("Users.Dept").Find(&children).Error; err != nil {
+		return err
+	}
+	for i := range children {
+		if err := childrenDept(children[i]); err != nil {
+			return err
 		}
 	}
+	dept.Children = children
 	return nil
 }
 

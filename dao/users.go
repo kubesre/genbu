@@ -20,10 +20,10 @@ import (
 type InterfaceUsers interface {
 	ExitUser(userName, password string) (bool, uint, uint)
 	Register(user *models.User) error
-	UserInfo(username string) (*models.User, error)
+	UserInfo(id int) (*models.User, error)
 	UserList(username string, limit, page int) (*models.UserList, error)
 	GetUserFromUserName(userName string) (*models.User, error)
-	UserUpdate(userData *models.User) error
+	UserUpdate(id int, userData *models.User) error
 	UserAdd(user *models.User) error
 }
 
@@ -65,9 +65,9 @@ func (u *userInfo) Register(user *models.User) error {
 
 // 用户详情
 
-func (u *userInfo) UserInfo(username string) (*models.User, error) {
+func (u *userInfo) UserInfo(id int) (*models.User, error) {
 	var user models.User
-	err := global.GORM.Where("username = ?", username).Preload("Role").Preload("Dept").First(&user).Error
+	err := global.GORM.Where("id = ?", id).Preload("Role").Preload("Dept").First(&user).Error
 	return &user, err
 }
 
@@ -104,8 +104,8 @@ func (u *userInfo) GetUserFromUserName(userName string) (*models.User, error) {
 
 // 用户更新
 
-func (u *userInfo) UserUpdate(userData *models.User) error {
-	if err := global.GORM.Model(&models.User{}).Where("id = ?", userData.ID).Updates(&userData).Error; err != nil {
+func (u *userInfo) UserUpdate(id int, userData *models.User) error {
+	if err := global.GORM.Model(&models.User{}).Where("id = ?", id).Updates(&userData).Error; err != nil {
 		return err
 	}
 	return nil

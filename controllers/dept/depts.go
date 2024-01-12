@@ -44,8 +44,8 @@ func ListDept(ctx *gin.Context) {
 // 部门详情
 
 func InfoDept(ctx *gin.Context) {
-	didStr, _ := ctx.GetQuery("id")
-	data, err := dept.NewDeptInterface().DeptInfo(didStr)
+	deptID := ctx.Param("dept_id")
+	data, err := dept.NewDeptInterface().DeptInfo(deptID)
 	if err != nil {
 		global.ReturnContext(ctx).Failed("failed", err.Error())
 		return
@@ -56,8 +56,9 @@ func InfoDept(ctx *gin.Context) {
 // 删除部门
 
 func DelDept(ctx *gin.Context) {
+	//deptID := ctx.Param("dept_id")
 	params := new(struct {
-		DeptID int `json:"dept_id"`
+		DeptID int `json:"dept_id" form:"dept_id"`
 	})
 	if err := ctx.ShouldBindJSON(&params); err != nil {
 		global.TPLogger.Error("删除部门参数校验失败：", err)

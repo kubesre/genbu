@@ -19,7 +19,7 @@ type InterfaceRoles interface {
 	AddRole(role *models.Role) error
 	RoleInfo(rid uint) (*models.Role, error)
 	UpdateRole(rid uint, roleData *models.Role) error
-	AddRelationRoleAndMenu(menuID, roleID []int) error
+	AddRelationRoleAndMenu(menuID []int, roleID int) error
 	DelRole(rid []int) error
 	RoleList() (roleData []*models.Role, err error)
 }
@@ -54,23 +54,24 @@ func (r *rolesInfo) UpdateRole(rid uint, roleData *models.Role) error {
 
 // 创建角色对应的菜单
 
-func (r *rolesInfo) AddRelationRoleAndMenu(menuID, roleID []int) error {
+func (r *rolesInfo) AddRelationRoleAndMenu(menuID []int, roleID int) error {
 	var (
-		menuList  []models.Menu
-		roleList  []models.Role
-		menuTotal int64
-		roleTotal int64
+		menuList []models.Menu
+		role     models.Role
 	)
-	// 先查询是否存在 角色和菜单
-	global.GORM.Model(&models.Menu{}).Where("id IN (?)", menuID).Count(&menuTotal)
-	if int(menuTotal) < len(menuID) {
+
+	// 查询菜单列表
+	global.GORM.Find(&menuList, menuID)
+	if len(menuList) != len(menuID) {
 		return errors.New("菜单不存在")
 	}
-	global.GORM.Model(&models.Role{}).Where("id IN (?)", roleID).Count(&roleTotal)
-	if int(roleTotal) < len(roleID) {
-		return errors.New("角色不存在")
+
+	// 查询角色列表
+	if err := global.GORM.First(&role, roleID).Error; err != nil {
+		return errors.New("角色不存在或查询角色失败")
 	}
-	err := global.GORM.Model(&roleList).Association("Menus").Append(menuList)
+
+	err := global.GORM.Model(&role).Association("Menus").Append(&menuList)
 	if err != nil {
 		return err
 	}
@@ -81,11 +82,10 @@ func (r *rolesInfo) AddRelationRoleAndMenu(menuID, roleID []int) error {
 
 func (r *rolesInfo) DelRole(rid []int) error {
 	var (
-		roleData  []models.Role
-		roleTotal int64
+		roleData []models.Role
 	)
-	global.GORM.Find(&roleData, rid).Count(&roleTotal)
-	if len(roleData) < len(rid) {
+	global.GORM.Find(&roleData, rid)
+	if len(roleData) != len(rid) {
 		return errors.New("角色列表中有不存在的ID")
 	}
 	// 清空角色与菜单的关系

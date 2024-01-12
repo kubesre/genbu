@@ -16,10 +16,10 @@ import (
 func InitDeptRouters(r *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) gin.IRoutes {
 	{
 		r.Use(authMiddleware.MiddlewareFunc())
-		r.POST("/dept/add", dept.AddDept)
-		r.GET("/dept/list", dept.ListDept)
-		r.GET("/dept/info", dept.InfoDept)
-		r.POST("/dept/del", dept.DelDept)
+		r.POST("/dept/addDept", dept.AddDept)  // 添加
+		r.GET("/dept/listDept", dept.ListDept) // 列表
+		// r.GET("/dept/:dept_id", dept.InfoDept)   // 详情
+		r.POST("/dept/deleteDept", dept.DelDept) // 删除
 	}
 	return r
 }

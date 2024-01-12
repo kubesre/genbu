@@ -17,8 +17,8 @@ import (
 func InitK8sRouters(r *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) gin.IRoutes {
 	{
 		r.Use(authMiddleware.MiddlewareFunc())
-		r.POST("/k8s/cluster/add", k8s.AddK8sCluster)
-		r.GET("/k8s/cluster/list", k8s.ListK8sCluster)
+		r.POST("/k8s/cluster", k8s.AddK8sCluster)
+		r.GET("/k8s/cluster", k8s.ListK8sCluster)
 		r.Use(middles.K8sClientCache())
 		r.GET("/k8s/cluster/:cid/node/list", k8s.GetK8sClusterNodeList)
 	}

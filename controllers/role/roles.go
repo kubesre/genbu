@@ -34,7 +34,7 @@ func AddRole(ctx *gin.Context) {
 // 获取角色详情
 
 func RolesInfo(ctx *gin.Context) {
-	idStr, _ := ctx.GetQuery("id")
+	idStr := ctx.Param("rid")
 	data, err := role.NewRoleInterface().RoleInfo(idStr)
 	if err != nil {
 		global.ReturnContext(ctx).Failed("failed", err.Error())
@@ -46,14 +46,13 @@ func RolesInfo(ctx *gin.Context) {
 // 更新角色
 
 func UpdateRole(ctx *gin.Context) {
-	idStr, _ := ctx.GetQuery("id")
 	params := new(models.Role)
 	if err := ctx.ShouldBindJSON(&params); err != nil {
 		global.TPLogger.Error("更新角色参数校验失败：", err)
 		global.ReturnContext(ctx).Failed("failed", err.Error())
 		return
 	}
-	err := role.NewRoleInterface().UpdateRole(idStr, params)
+	err := role.NewRoleInterface().UpdateRole(params.ID, params)
 	if err != nil {
 		global.ReturnContext(ctx).Failed("failed", err.Error())
 		return
@@ -67,7 +66,7 @@ func UpdateRole(ctx *gin.Context) {
 func AddRelationRoleAndMenu(ctx *gin.Context) {
 	params := new(struct {
 		MenuID []int `json:"menu_id" form:"menu_id"`
-		RoleID []int `json:"role_id" form:"role_id"`
+		RoleID int   `json:"role_id" form:"role_id"`
 	})
 	if err := ctx.ShouldBindJSON(&params); err != nil {
 		global.TPLogger.Error("创建角色对应的菜单参数校验失败：", err)

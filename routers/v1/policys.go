@@ -9,6 +9,7 @@ package v1
 
 import (
 	"genbu/controllers/casbin"
+	"genbu/controllers/role"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 )
@@ -16,9 +17,10 @@ import (
 func InitPolicyRouters(r *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) gin.IRoutes {
 	{
 		r.Use(authMiddleware.MiddlewareFunc())
-		r.POST("/policy/add", casbin.AddCasbin)
-		r.POST("/policy/del", casbin.DelPolicy)
-		r.GET("/policy/list", casbin.ListPolicy)
+		r.POST("/policy/role/api/addPolicy", casbin.AddCasbin)
+		r.POST("/policy/role/api/deletePolicy", casbin.DelPolicy)
+		r.GET("/policy/role/api/listPolicy", casbin.ListPolicy)
+		r.POST("/policy/role/menu/addPolicy", role.AddRelationRoleAndMenu)
 	}
 	return r
 }

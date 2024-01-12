@@ -35,8 +35,8 @@ func Register(ctx *gin.Context) {
 // 用户详情
 
 func GetUserInfo(ctx *gin.Context) {
-	username := ctx.Keys["username"]
-	data, err := users.NewUserInfo().UserInfo(username)
+	id := ctx.Keys["id"]
+	data, err := users.NewUserInfo().UserInfo(id)
 	if err != nil {
 		global.ReturnContext(ctx).Failed("failed", err.Error())
 		return
@@ -75,7 +75,7 @@ func UserUpdate(ctx *gin.Context) {
 		global.ReturnContext(ctx).Failed("failed", err)
 		return
 	}
-	err := users.NewUserInfo().UserUpdate(params)
+	err := users.NewUserInfo().UserUpdate(params.ID, params)
 	if err != nil {
 		global.ReturnContext(ctx).Failed("failed", err)
 		return

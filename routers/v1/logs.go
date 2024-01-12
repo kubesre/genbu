@@ -16,7 +16,7 @@ import (
 func InitLogRouters(r *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) gin.IRoutes {
 	{
 		r.Use(authMiddleware.MiddlewareFunc())
-		r.GET("/log/list", operationLogs.GetOperationLogList)
+		r.GET("/log", operationLogs.GetOperationLogList)
 	}
 	return r
 }

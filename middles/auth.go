@@ -15,7 +15,7 @@ import (
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
-	"strconv"
+	"net/http"
 	"time"
 )
 
@@ -44,9 +44,11 @@ func InitAuth() (*jwt.GinJWTMiddleware, error) {
 // 用户登录是执行顺序 2
 func payloadFunc(data interface{}) jwt.MapClaims {
 	if v, ok := data.(*models.User); ok {
+		fmt.Printf("payloadFunc%d%s", v.ID, v.UserName)
 		return jwt.MapClaims{
 			jwt.IdentityKey: v.ID,
 			"username":      v.UserName,
+			"id":            v.ID,
 		}
 	}
 	// TODO 将用户数据同步进缓存
@@ -58,7 +60,7 @@ func payloadFunc(data interface{}) jwt.MapClaims {
 func identityHandler(c *gin.Context) interface{} {
 	claims := jwt.ExtractClaims(c)
 	var jwtClaim models.User
-	userID, _ := strconv.Atoi(fmt.Sprintf("%d", claims[jwt.IdentityKey]))
+	userID, _ := claims[jwt.IdentityKey].(float64)
 	userNameStr := fmt.Sprintf("%s", claims["username"])
 	jwtClaim.ID = uint(userID)
 	jwtClaim.UserName = userNameStr
@@ -73,11 +75,9 @@ func loginFunc(c *gin.Context) (interface{}, error) {
 	}
 	userName := loginUser.UserName
 	password := loginUser.Password
-	ok, id, roleID := dao.NewUserInterface().ExitUser(userName, password)
+	ok, id, _ := dao.NewUserInterface().ExitUser(userName, password)
 	if ok {
 		loginUser.ID = id
-		c.Set("id", id)
-		c.Set("roleID", roleID)
 		return &loginUser, nil
 	}
 	return nil, jwt.ErrFailedAuthentication
@@ -87,6 +87,7 @@ func loginFunc(c *gin.Context) (interface{}, error) {
 func authorizator(data interface{}, c *gin.Context) bool {
 	if v, ok := data.(*models.User); ok {
 		c.Set("username", v.UserName)
+		c.Set("id", v.ID)
 		return true
 	}
 	return false
@@ -94,21 +95,19 @@ func authorizator(data interface{}, c *gin.Context) bool {
 
 // 处理jwt 3
 func unauthorized(c *gin.Context, code int, message string) {
-	global.ReturnContext(c).Failed("failed", message)
+	response := gin.H{
+		"code": code,
+		"msg:": "failed",
+		"data": message,
+	}
+	c.JSON(http.StatusOK, response)
 	return
 }
 
 // 用户登录是执行顺序 3
 func loginResponse(c *gin.Context, code int, token string, expires time.Time) {
-	//id, isID := c.Get("id")
-	//roleID, isRoleID := c.Get("roleID")
-	//if !isID || !isRoleID {
-	//	return
-	//}
 	global.ReturnContext(c).Successful("success", map[string]interface{}{
-		"token": token,
-		//"id":      id,
-		//"role_id": roleID,
+		"token":   token,
 		"expires": expires.Format("2006-01-02 15:04:05"),
 	})
 	return

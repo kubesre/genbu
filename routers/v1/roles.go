@@ -16,12 +16,11 @@ import (
 func InitRolesRouters(r *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) gin.IRoutes {
 	{
 		r.Use(authMiddleware.MiddlewareFunc())
-		r.GET("/role/info", role.RolesInfo)
-		r.POST("/role/add", role.AddRole)
-		r.POST("/role/update", role.UpdateRole)
-		r.POST("/role/bind_menu", role.AddRelationRoleAndMenu)
-		r.POST("/role/del", role.DelRole)
-		r.GET("/role/list", role.ListRole)
+		r.GET("/role/infoRole/:rid", role.RolesInfo)
+		r.POST("/role/addRole", role.AddRole)
+		r.POST("/role/updateRole", role.UpdateRole)
+		r.POST("/role/deleteRole", role.DelRole)
+		r.GET("/role/listRole", role.ListRole)
 	}
 	return r
 }
