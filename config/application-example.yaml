@@ -1,0 +1,41 @@
+server:
+  port: 8899
+  address: 0.0.0.0
+  name: genbu
+  # # 生产环境建议使用release，debug：可以使用debug模式
+  model: debug
+
+mysql:
+  DbHost: 127.0.0.1
+  DbPort: 3306
+  # 数据库名称 需要提前创建好
+  DbName: genbu
+  DbUser: root
+  DbPwd: 123456
+  MaxIdleConns: 10
+  MaxOpenConns: 100
+  # 是否开启debug，1 开启 0 关闭
+  ActiveDebug: 1
+
+jwt:
+  realm: genbu
+  # jwt加密因子
+  key: anruo
+  #  jwt token过期时间 单位为小时
+  timeout: 1
+  # jwt token刷新时间 单位为小时
+  maxRefresh: 1
+
+operation:
+  # 是否开启操作记录审计 1 开启(操作记录会入库)  0 关闭
+  ActiveLog: 1
+  # 用于记录日志的协程数量 默认为3个
+  GoroutineNum: 3
+
+ipLocation:
+  # 使用百度的在线IP地址查询
+  siteURL: https://qifu-api.baidubce.com/ip/geo/v1/district
+
+aes:
+  # 加密使用的key
+  key: genbu
