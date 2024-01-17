@@ -12,32 +12,20 @@ import (
 	"errors"
 	"fmt"
 	"genbu/common/global"
-	"genbu/dao/k8s"
-	"genbu/utils"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 	"time"
 )
 
 // 获取node节点信息
 
-func (k *k8sCluster) GetK8sClusterNodeList(cid interface{}) (err error) {
-	cidStr, _ := cid.(string)
-	cluster, err := k8s.NewK8sInterface().ActiveK8sCluster(cidStr)
-	if err != nil {
-		global.TPLogger.Error("获取可用集群信息失败: ", err)
-		return errors.New("获取可用集群信息失败")
+func (k *k8sCluster) GetK8sClusterNodeList(cid string) (err error) {
+	clientSetAny, found := global.ClientSetCache.Get(cid)
+	if !found {
+		global.TPLogger.Error("当前集群不存在：", err)
+		return errors.New("当前集群不存在")
 	}
-	configStr := cluster.Text
-	decodeConfig, err := utils.DecodeBase64(configStr)
-	if err != nil {
-		global.TPLogger.Error("集群config文件加载失败: ", err)
-		return errors.New("集群config文件加载失败")
-	}
-	clientSet, err := global.NewClientInterface().NewClientSet(decodeConfig)
-	if err != nil {
-		global.TPLogger.Error("初始化client失败：", err)
-		return errors.New("初始化client失败")
-	}
+	clientSet := clientSetAny.(*kubernetes.Clientset)
 	// 获取config
 	var (
 		ctx    context.Context

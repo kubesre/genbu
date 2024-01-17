@@ -50,3 +50,47 @@ func ListK8sCluster(ctx *gin.Context) {
 	}
 	global.ReturnContext(ctx).Successful("success", data)
 }
+
+// 集群删除
+
+func DeleteK8sCluster(ctx *gin.Context) {
+	params := new(struct {
+		CID []string `json:"c_id"`
+	})
+	if err := ctx.ShouldBindJSON(&params); err != nil {
+		global.TPLogger.Error("集群删除数据绑定失败：", err)
+		global.ReturnContext(ctx).Failed("failed", err)
+		return
+	}
+	if err := sk.NewK8sInterface().DeleteK8sCluster(params.CID); err != nil {
+		global.ReturnContext(ctx).Failed("failed", err)
+		return
+	}
+	global.ReturnContext(ctx).Successful("success", "集群删除成功")
+}
+
+// 集群更新
+
+func UpdateK8sCluster(ctx *gin.Context) {
+	params := new(k8s.Configs)
+	if err := ctx.ShouldBindJSON(&params); err != nil {
+		global.TPLogger.Error("集群更新数据绑定失败：", err)
+		global.ReturnContext(ctx).Failed("failed", err)
+		return
+	}
+	if err := sk.NewK8sInterface().UpdateK8sCluster(params); err != nil {
+		global.ReturnContext(ctx).Failed("failed", err)
+		return
+	}
+	global.ReturnContext(ctx).Successful("success", "集群更新成功")
+}
+
+// 刷新集群
+
+func RefreshK8sCluster(ctx *gin.Context) {
+	if err := sk.NewK8sInterface().RefreshK8sCluster(); err != nil {
+		global.ReturnContext(ctx).Failed("failed", err)
+		return
+	}
+	global.ReturnContext(ctx).Successful("success", "集群刷新成功")
+}
