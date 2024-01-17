@@ -8,11 +8,8 @@
 package k8s
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"genbu/common/global"
 	"genbu/models/k8s"
-	"time"
 )
 
 type InterfaceK8s interface {
@@ -20,6 +17,8 @@ type InterfaceK8s interface {
 	ListK8sCluster(name string, limit, page int) (clusters *k8s.ClusterK8sList, err error)
 	ActiveK8sCluster(cid string) (cluster *k8s.Configs, err error)
 	ActiveK8sClusterList() (clusters []*k8s.Configs, err error)
+	DeleteK8sCluster(cid []string) error
+	UpdateK8sCluster(cluster *k8s.Configs) error
 }
 
 type k8sCluster struct{}
@@ -31,9 +30,6 @@ func NewK8sInterface() InterfaceK8s {
 // k8s 集群添加
 
 func (k *k8sCluster) AddK8sCluster(cluster *k8s.Configs) (err error) {
-	localTime := time.Now().String()
-	hash := md5.Sum([]byte(localTime))
-	cluster.CID = hex.EncodeToString(hash[:])
 	if err = global.GORM.Model(&k8s.Configs{}).Create(&cluster).Error; err != nil {
 		return err
 	}
@@ -75,4 +71,22 @@ func (k *k8sCluster) ActiveK8sClusterList() (clusters []*k8s.Configs, err error)
 		return nil, err
 	}
 	return clusters, nil
+}
+
+// 集群删除
+
+func (k *k8sCluster) DeleteK8sCluster(cid []string) error {
+	if err := global.GORM.Delete(&k8s.Configs{}, "c_id IN (?)", cid).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+// 集群更新
+
+func (k *k8sCluster) UpdateK8sCluster(cluster *k8s.Configs) error {
+	if err := global.GORM.Model(&k8s.Configs{}).Where("id = ?", cluster.ID).Updates(&cluster).Error; err != nil {
+		return err
+	}
+	return nil
 }

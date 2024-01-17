@@ -14,6 +14,7 @@ require (
 )
 
 require (
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	k8s.io/api v0.23.1
 	k8s.io/apimachinery v0.23.1
 	k8s.io/client-go v0.23.1

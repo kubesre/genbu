@@ -12,7 +12,10 @@ import "genbu/models/k8s"
 type InterfaceK8s interface {
 	AddK8sCluster(cluster *k8s.Configs) (err error)
 	ListK8sCluster(name string, limit, page int) (clusters *k8s.ClusterK8sList, err error)
-	GetK8sClusterNodeList(cid interface{}) (err error)
+	GetK8sClusterNodeList(cid string) (err error)
+	DeleteK8sCluster(id []string) error
+	UpdateK8sCluster(cluster *k8s.Configs) error
+	RefreshK8sCluster() error
 }
 
 type k8sCluster struct{}
