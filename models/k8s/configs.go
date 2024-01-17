@@ -7,7 +7,9 @@
 
 package k8s
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 // k8s config文件
 
@@ -17,7 +19,6 @@ type Configs struct {
 	CID      string `json:"cid" form:"cid" gorm:"type:varchar(500);not null;unique;comment:'集群ID'"`
 	Text     string `json:"text" form:"text" gorm:"type:text;not null;comment:'config文件内容'"`
 	Status   uint   `gorm:"type:tinyint(1);default:1;comment:'状态(正常/禁用, 默认正常)'" json:"status"`
-	Active   string `json:"active" form:"active" gorm:"type:varchar(128);not null;comment:'集群运行状态'"`
 	CreateBy string `gorm:"column:create_by;comment:'创建来源'" json:"create_by" form:"create_by"`
 }
 
