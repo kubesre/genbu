@@ -11,10 +11,10 @@ import (
 	"context"
 	"fmt"
 	"genbu/common/global"
-	"genbu/dao"
+	"genbu/dao/system"
 	"genbu/middles"
 	"genbu/routers"
-	"genbu/service/k8s"
+	"genbu/service/kubernetes"
 	"github.com/spf13/viper"
 	"log"
 	"net/http"
@@ -40,12 +40,12 @@ func Run() {
 			goroutineNum = 3
 		}
 		for i := 0; i < goroutineNum; i++ {
-			go dao.NewOperationLogService().SaveOperationLogChannel(middles.OperationLogChan)
+			go system.NewOperationLogService().SaveOperationLogChannel(middles.OperationLogChan)
 		}
 	}
 	// 开启k8s client缓存
 	go func() {
-		_ = k8s.InitAllClient()
+		_ = kubernetes.InitAllClient()
 	}()
 	// 关闭服务
 	go func() {

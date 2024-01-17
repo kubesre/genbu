@@ -13,7 +13,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-// k8s client
+// kubernetes client
 
 type ClientInterface interface {
 	NewClientSet(configText string) (*kubernetes.Clientset, error)
