@@ -9,8 +9,8 @@ package global
 
 import (
 	"fmt"
-	"genbu/models"
-	"genbu/models/k8s"
+	"genbu/models/kubernetes"
+	"genbu/models/system"
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -50,13 +50,13 @@ func InitMysql() {
 
 func InitMysqlTables() {
 	err = GORM.AutoMigrate(
-		models.OperationLog{},
-		models.User{},
-		models.Menu{},
-		models.Role{},
-		models.Dept{},
-		models.APIPath{},
-		k8s.Configs{},
+		system.OperationLog{},
+		system.User{},
+		system.Menu{},
+		system.Role{},
+		system.Dept{},
+		system.APIPath{},
+		kubernetes.Configs{},
 	)
 	if err != nil {
 		TPLogger.Error("生成数据表失败", err)
