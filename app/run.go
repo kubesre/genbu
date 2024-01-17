@@ -14,6 +14,7 @@ import (
 	"genbu/dao"
 	"genbu/middles"
 	"genbu/routers"
+	"genbu/service/k8s"
 	"github.com/spf13/viper"
 	"log"
 	"net/http"
@@ -42,6 +43,10 @@ func Run() {
 			go dao.NewOperationLogService().SaveOperationLogChannel(middles.OperationLogChan)
 		}
 	}
+	// 开启k8s client缓存
+	go func() {
+		_ = k8s.InitAllClient()
+	}()
 	// 关闭服务
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -73,4 +78,6 @@ func init() {
 	global.InitMysqlTables()
 	// 初始化casbin
 	global.InitCasbinEnforcer()
+	// 初始化client缓存设置
+	global.InitK8sClientCache()
 }

@@ -10,7 +10,9 @@ package middles
 import (
 	"genbu/common/global"
 	"genbu/dao/k8s"
+	"genbu/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/patrickmn/go-cache"
 	"strings"
 )
 
@@ -21,32 +23,37 @@ func K8sClientCache() gin.HandlerFunc {
 		// 获取请求路径
 		path := strings.Split(c.Request.RequestURI, "?")[0]
 		if !strings.Contains(path, "cluster") {
-			global.TPLogger.Error("没有指定请求集群ID")
+			global.TPLogger.Error("请求失败")
+			global.ReturnContext(c).Successful("failed", "请求路径有误")
 			c.Abort()
 			return
 		}
-		clusterID := c.Keys["cluster"]
-		clusterIDStr, _ := clusterID.(string)
-		if clusterID != nil && strings.Contains(path, clusterIDStr) {
+		cidStr := c.Param("cid")
+		// 查找缓存 key = cidStr
+		_, found := global.ClientSetCache.Get(cidStr)
+		if found {
+			global.TPLogger.Info("该请求ID在缓存中")
 			c.Next()
 		}
-		// 获取集群列表
-		data, err := k8s.NewK8sInterface().ActiveK8sClusterList()
+		// 是否存在该cid
+		cluster, err := k8s.NewK8sInterface().ActiveK8sCluster(cidStr)
 		if err != nil {
-			global.TPLogger.Error("获取集群信息失败：", err)
+			global.TPLogger.Error("集群获取失败：", err)
+			global.ReturnContext(c).Successful("failed", "集群获取失败")
 			c.Abort()
 			return
 		}
-		for _, item := range data {
-			if strings.Contains(path, item.CID) {
-				c.Set("cluster", item.CID)
-				break
-			} else {
-				global.TPLogger.Error("没有指定请求集群ID")
-				c.Abort()
-				return
-			}
+		// 将该集群加入到缓存中
+		configStr := cluster.Text
+		decodeConfig, _ := utils.DecodeBase64(configStr)
+		clientSet, err := global.NewClientInterface().NewClientSet(decodeConfig)
+		if err != nil {
+			global.TPLogger.Error("集群初始化失败：", err)
+			global.ReturnContext(c).Successful("failed", "集群初始化失败")
+			c.Abort()
+			return
 		}
+		global.ClientSetCache.Set(cidStr, clientSet, cache.NoExpiration)
 		global.TPLogger.Info("放行k8s中间件")
 		c.Next()
 

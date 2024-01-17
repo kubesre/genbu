@@ -14,7 +14,7 @@ import (
 )
 
 func GetK8sClusterNodeList(ctx *gin.Context) {
-	clusterID := ctx.Keys["cluster"]
+	clusterID := ctx.Param("cid")
 	err := k8s.NewK8sInterface().GetK8sClusterNodeList(clusterID)
 	if err != nil {
 		global.ReturnContext(ctx).Failed("failed", err.Error())
