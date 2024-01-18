@@ -9,7 +9,7 @@ package middles
 
 import (
 	"genbu/common/global"
-	"genbu/dao"
+	"genbu/dao/system"
 	"github.com/gin-gonic/gin"
 	"strconv"
 	"strings"
@@ -24,7 +24,7 @@ func CasbinMiddle() gin.HandlerFunc {
 		} else {
 			// TODO 从缓存中获取用户相关的信息，例如：role、dept、menu
 			// 从数据库中获取用户角色信息sub
-			usersInfo, err := dao.NewUserInterface().GetUserFromUserName(ctxUser)
+			usersInfo, err := system.NewUserInterface().GetUserFromUserName(ctxUser)
 			if err != nil {
 				global.TPLogger.Error("从数据库中获取用户角色信息sub失败:", err)
 				return

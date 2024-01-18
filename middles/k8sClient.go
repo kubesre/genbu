@@ -9,14 +9,14 @@ package middles
 
 import (
 	"genbu/common/global"
-	"genbu/dao/k8s"
+	"genbu/dao/kubernetes"
 	"genbu/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/patrickmn/go-cache"
 	"strings"
 )
 
-// k8s client 中间件
+// kubernetes client 中间件
 
 func K8sClientCache() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -36,7 +36,7 @@ func K8sClientCache() gin.HandlerFunc {
 			c.Next()
 		}
 		// 是否存在该cid
-		cluster, err := k8s.NewK8sInterface().ActiveK8sCluster(cidStr)
+		cluster, err := kubernetes.NewK8sInterface().ActiveK8sCluster(cidStr)
 		if err != nil {
 			global.TPLogger.Error("集群获取失败：", err)
 			global.ReturnContext(c).Successful("failed", "集群获取失败")

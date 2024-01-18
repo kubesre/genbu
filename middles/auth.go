@@ -10,8 +10,8 @@ package middles
 import (
 	"fmt"
 	"genbu/common/global"
-	"genbu/dao"
-	"genbu/models"
+	"genbu/dao/system"
+	system2 "genbu/models/system"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
@@ -43,7 +43,7 @@ func InitAuth() (*jwt.GinJWTMiddleware, error) {
 // 用户登录成功后被调用，并且会接收一个参数 data，表示用户信息
 // 用户登录是执行顺序 2
 func payloadFunc(data interface{}) jwt.MapClaims {
-	if v, ok := data.(*models.User); ok {
+	if v, ok := data.(*system2.User); ok {
 		fmt.Printf("payloadFunc%d%s", v.ID, v.UserName)
 		return jwt.MapClaims{
 			jwt.IdentityKey: v.ID,
@@ -59,7 +59,7 @@ func payloadFunc(data interface{}) jwt.MapClaims {
 // 处理jwt 1
 func identityHandler(c *gin.Context) interface{} {
 	claims := jwt.ExtractClaims(c)
-	var jwtClaim models.User
+	var jwtClaim system2.User
 	userID, _ := claims[jwt.IdentityKey].(float64)
 	userNameStr := fmt.Sprintf("%s", claims["username"])
 	jwtClaim.ID = uint(userID)
@@ -69,13 +69,13 @@ func identityHandler(c *gin.Context) interface{} {
 
 // 用户登录是执行顺序 1
 func loginFunc(c *gin.Context) (interface{}, error) {
-	var loginUser models.User
+	var loginUser system2.User
 	if err := c.ShouldBind(&loginUser); err != nil {
 		return "", jwt.ErrMissingLoginValues
 	}
 	userName := loginUser.UserName
 	password := loginUser.Password
-	ok, id, _ := dao.NewUserInterface().ExitUser(userName, password)
+	ok, id, _ := system.NewUserInterface().ExitUser(userName, password)
 	if ok {
 		loginUser.ID = id
 		return &loginUser, nil
@@ -85,7 +85,7 @@ func loginFunc(c *gin.Context) (interface{}, error) {
 
 // 处理jwt 2
 func authorizator(data interface{}, c *gin.Context) bool {
-	if v, ok := data.(*models.User); ok {
+	if v, ok := data.(*system2.User); ok {
 		c.Set("username", v.UserName)
 		c.Set("id", v.ID)
 		return true
