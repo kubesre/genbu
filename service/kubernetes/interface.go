@@ -16,6 +16,7 @@ type InterfaceK8s interface {
 	DeleteK8sCluster(id []string) error
 	UpdateK8sCluster(cluster *kubernetes.Configs) error
 	RefreshK8sCluster() error
+	ListK8sConfig(cid string)
 }
 
 type k8sCluster struct{}

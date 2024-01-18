@@ -41,3 +41,6 @@ type ClusterK8sList struct {
 	Items []*Configs `json:"items"`
 	Total int64      `json:"total"`
 }
+
+
+type ConfigMap struct {}
