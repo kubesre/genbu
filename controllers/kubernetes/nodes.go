@@ -14,11 +14,23 @@ import (
 )
 
 func GetK8sClusterNodeList(ctx *gin.Context) {
+	params := new(struct {
+		Name  string `form:"name"`
+		Page  int    `form:"page"`
+		Limit int    `form:"limit"`
+	})
+
 	clusterID := ctx.Param("cid")
-	err := service.NewK8sInterface().GetK8sClusterNodeList(clusterID)
+
+	if err := ctx.Bind(params); err != nil {
+		global.ReturnContext(ctx).Failed("绑定参数失败", err.Error())
+		return
+	}
+
+	data, err := service.NewK8sInterface().GetK8sClusterNodeList(clusterID, params.Name, params.Page, params.Limit)
 	if err != nil {
 		global.ReturnContext(ctx).Failed("failed", err.Error())
 		return
 	}
-	global.ReturnContext(ctx).Successful("success", "success")
+	global.ReturnContext(ctx).Successful("success", data)
 }
