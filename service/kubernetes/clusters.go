@@ -31,6 +31,9 @@ func (k *k8sCluster) AddK8sCluster(cluster *kubernetes.Configs) (err error) {
 		global.TPLogger.Error("初始化clientSet失败：", err)
 		return
 	}
+	// 获取集群版本信息
+	version, _ := clientSet.ServerVersion()
+	cluster.Version = version.String()
 	err = dao.NewK8sInterface().AddK8sCluster(cluster)
 	if err != nil {
 		global.TPLogger.Error("集群添加失败：", err)
@@ -92,9 +95,22 @@ func (k *k8sCluster) UpdateK8sCluster(cluster *kubernetes.Configs) error {
 // 集群刷新
 
 func (k *k8sCluster) RefreshK8sCluster() error {
-	if err := InitAllClient(); err != nil {
-		global.TPLogger.Error("集群刷新失败：", err)
-		return errors.New("集群刷新失败")
+	ClusterList, _ := dao.NewK8sInterface().ListK8sCluster("", 0, 0)
+	for _, cluster := range ClusterList.Items {
+		decodeConfig, _ := utils.DecodeBase64(cluster.Text)
+		clientSet, err := global.NewClientInterface().NewClientSet(decodeConfig)
+		if err != nil {
+			global.TPLogger.Error("初始化clientSet失败：", err)
+			cluster.Status = 0
+			err = dao.NewK8sInterface().UpdateK8sCluster(cluster)
+			return err
+		}
+		cluster.Status = 0
+		version, _ := clientSet.ServerVersion()
+		cluster.Version = version.String()
+		cluster.Status = 0
+		err = dao.NewK8sInterface().UpdateK8sCluster(cluster)
+		return err
 	}
 	return nil
 }
