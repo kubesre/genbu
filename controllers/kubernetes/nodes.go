@@ -34,3 +34,24 @@ func GetK8sClusterNodeList(ctx *gin.Context) {
 	}
 	global.ReturnContext(ctx).Successful("success", data)
 }
+
+func GetK8sClusterNodeDetail(ctx *gin.Context) {
+	params := new(struct {
+		Name string `form:"name"`
+	})
+
+	clusterID := ctx.Param("cid")
+
+	if err := ctx.Bind(params); err != nil {
+		global.ReturnContext(ctx).Failed("绑定参数失败", err.Error())
+		return
+	}
+
+	data, err := service.NewK8sInterface().GetK8sClusterNodeDetail(clusterID, params.Name)
+
+	if err != nil {
+		global.ReturnContext(ctx).Failed("failed", err.Error())
+		return
+	}
+	global.ReturnContext(ctx).Successful("success", data)
+}

@@ -62,6 +62,30 @@ func (k *k8sCluster) GetK8sClusterNodeList(cid string, name string, page, limit 
 	}, nil
 }
 
+func (k *k8sCluster) GetK8sClusterNodeDetail(cid string, name string) (node *corev1.Node, err error) {
+	clientSetAny, found := global.ClientSetCache.Get(cid)
+	if !found {
+		global.TPLogger.Error("当前集群不存在：", err)
+		return nil, errors.New("当前集群不存在")
+	}
+	clientSet := clientSetAny.(*kubernetes.Clientset)
+	// 获取config
+	var (
+		ctx    context.Context
+		cancel context.CancelFunc
+	)
+	ctx, cancel = context.WithTimeout(context.TODO(), time.Second*2)
+	defer cancel()
+
+	node, err = clientSet.CoreV1().Nodes().Get(ctx, name, metav1.GetOptions{})
+	if err != nil {
+		global.TPLogger.Error("获取node详情失败：", err)
+		return nil, errors.New("获取node详情失败")
+	}
+
+	return node, nil
+}
+
 // 把corev1 node转成DataCell
 func (k *k8sCluster) toCells(std []corev1.Node) []DataCell {
 	cells := make([]DataCell, len(std))
