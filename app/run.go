@@ -11,9 +11,10 @@ import (
 	"context"
 	"fmt"
 	"genbu/common/global"
-	"genbu/dao"
+	"genbu/dao/system"
 	"genbu/middles"
 	"genbu/routers"
+	"genbu/service/kubernetes"
 	"github.com/spf13/viper"
 	"log"
 	"net/http"
@@ -39,9 +40,13 @@ func Run() {
 			goroutineNum = 3
 		}
 		for i := 0; i < goroutineNum; i++ {
-			go dao.NewOperationLogService().SaveOperationLogChannel(middles.OperationLogChan)
+			go system.NewOperationLogService().SaveOperationLogChannel(middles.OperationLogChan)
 		}
 	}
+	// 开启k8s client缓存
+	go func() {
+		_ = kubernetes.InitAllClient()
+	}()
 	// 关闭服务
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -73,4 +78,6 @@ func init() {
 	global.InitMysqlTables()
 	// 初始化casbin
 	global.InitCasbinEnforcer()
+	// 初始化client缓存设置
+	global.InitK8sClientCache()
 }

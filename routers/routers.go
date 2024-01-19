@@ -11,7 +11,9 @@ import (
 	"fmt"
 	"genbu/common/global"
 	"genbu/middles"
-	v1 "genbu/routers/v1"
+	"genbu/routers/base"
+	"genbu/routers/kubernetes"
+	system "genbu/routers/system"
 	"github.com/gin-gonic/gin"
 	"time"
 )
@@ -47,21 +49,23 @@ func BaseRouters() *gin.Engine {
 	// 不需要做鉴权的接口 PublicGroup
 	PublicGroup := r.Group("/api")
 	{
-		v1.InitBaseRouters(PublicGroup, authMiddleware)
+		base.InitBaseRouters(PublicGroup, authMiddleware)
 	}
 	// 需要做鉴权的接口
 	PrivateGroup := r.Group("/api")
+	PrivateGroup.Use(authMiddleware.MiddlewareFunc())
 	// 鉴权
 	//PrivateGroup.Use(gin.Recovery()).
 	//	Use(middles.OperationLog()).Use(middles.CasbinMiddle())
 	{
-		v1.InitUserRouters(PrivateGroup, authMiddleware)
-		v1.InitRolesRouters(PrivateGroup, authMiddleware)
-		v1.InitDeptRouters(PrivateGroup, authMiddleware)
-		v1.InitMenusRouters(PrivateGroup, authMiddleware)
-		v1.InitPolicyRouters(PrivateGroup, authMiddleware)
-		v1.InitLogRouters(PrivateGroup, authMiddleware)
-		v1.InitK8sRouters(PrivateGroup, authMiddleware)
+		system.InitUserRouters(PrivateGroup, authMiddleware)
+		system.InitRolesRouters(PrivateGroup)
+		system.InitDeptRouters(PrivateGroup)
+		system.InitMenusRouters(PrivateGroup)
+		system.InitPolicyRouters(PrivateGroup)
+		system.InitLogRouters(PrivateGroup)
+		kubernetes.InitClusterRouters(PrivateGroup)
+		kubernetes.InitNodeRouters(PrivateGroup)
 	}
 	r.NoRoute(func(ctx *gin.Context) {
 		global.ReturnContext(ctx).Failed("fail", "该接口未开放")

@@ -8,11 +8,12 @@
 package global
 
 import (
+	"github.com/patrickmn/go-cache"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-// k8s client
+// kubernetes client
 
 type ClientInterface interface {
 	NewClientSet(configText string) (*kubernetes.Clientset, error)
@@ -46,4 +47,12 @@ func (c *clientResource) NewClientSet(configText string) (*kubernetes.Clientset,
 	TPLogger.Info("集群连接成功！！！", version.String())
 
 	return clientSet, nil
+}
+
+// 初始化缓存设置永不过期
+
+var ClientSetCache *cache.Cache
+
+func InitK8sClientCache() {
+	ClientSetCache = cache.New(cache.NoExpiration, 0)
 }
