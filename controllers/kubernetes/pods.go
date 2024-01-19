@@ -2,7 +2,7 @@ package kubernetes
 
 import (
 	"genbu/common/global"
-	"genbu/service/k8s"
+	service "genbu/service/kubernetes"
 	"github.com/gin-gonic/gin"
 	"strconv"
 )
@@ -13,7 +13,7 @@ import (
 @Desc:
 */
 func GetK8sClusterPodList(ctx *gin.Context) {
-	clusterID := ctx.Keys["cluster"]
+	clusterID := ctx.Param("cid")
 	namespace := ctx.Query("namespace")
 	name := ctx.Query("name")
 	pageStr := ctx.Query("page")
@@ -29,10 +29,10 @@ func GetK8sClusterPodList(ctx *gin.Context) {
 		return
 	}
 
-	err = k8s.NewK8sInterface().GetK8sClusterPodList(clusterID, namespace, name, page, pageSize)
+	ret, err := service.NewK8sInterface().GetK8sClusterPodList(clusterID, namespace, name, page, pageSize)
 	if err != nil {
 		global.ReturnContext(ctx).Failed("获取结果失败", err.Error())
 		return
 	}
-	global.ReturnContext(ctx).Successful("获取结果成功", "success")
+	global.ReturnContext(ctx).Successful("获取结果成功", ret)
 }

@@ -13,6 +13,7 @@ type InterfaceK8s interface {
 	AddK8sCluster(cluster *kubernetes.Configs) (err error)
 	ListK8sCluster(name string, limit, page int) (clusters *kubernetes.ClusterK8sList, err error)
 	GetK8sClusterNodeList(cid string) (err error)
+	GetK8sClusterPodList(cid string, namespace, name string, page, pageSize int) (ret interface{}, err error)
 	DeleteK8sCluster(id []string) error
 	UpdateK8sCluster(cluster *kubernetes.Configs) error
 	RefreshK8sCluster() error

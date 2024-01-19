@@ -55,7 +55,7 @@ func BaseRouters() *gin.Engine {
 	PrivateGroup := r.Group("/api")
 	PrivateGroup.Use(authMiddleware.MiddlewareFunc())
 	// 鉴权
-	//PrivateGroup.Use(gin.Recovery()).
+	// PrivateGroup.Use(gin.Recovery()).
 	//	Use(middles.OperationLog()).Use(middles.CasbinMiddle())
 	{
 		system.InitUserRouters(PrivateGroup, authMiddleware)
@@ -66,6 +66,7 @@ func BaseRouters() *gin.Engine {
 		system.InitLogRouters(PrivateGroup)
 		kubernetes.InitClusterRouters(PrivateGroup)
 		kubernetes.InitNodeRouters(PrivateGroup)
+		kubernetes.InitPodRouters(PrivateGroup)
 	}
 	r.NoRoute(func(ctx *gin.Context) {
 		global.ReturnContext(ctx).Failed("fail", "该接口未开放")
