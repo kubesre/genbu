@@ -14,7 +14,9 @@ import (
 func InitPodRouters(r *gin.RouterGroup) gin.IRoutes {
 	r = r.Group("/kubernetes/:cid")
 	{
-		r.GET("/pod/getPod", kubernetes.GetK8sClusterPodList)
+		r.GET("/pod/getPodList", kubernetes.GetPodList)
+		r.GET("/pod/getPod", kubernetes.GetPod)
+		r.POST("/pod/createPod", kubernetes.CreatePod)
 	}
 	return r
 }
