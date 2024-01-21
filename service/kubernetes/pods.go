@@ -2,11 +2,13 @@ package kubernetes
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"genbu/common/global"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes"
 	"time"
 )
@@ -26,22 +28,45 @@ func (k *k8sCluster) GetPodList(cid string, namespace string, page, pageSize int
 	clientSet := clientSetAny.(*kubernetes.Clientset)
 	// 获取config
 	var (
-		ctx    context.Context
-		cancel context.CancelFunc
+		ctx     context.Context
+		cancel  context.CancelFunc
+		allPods []corev1.Pod
 	)
 	ctx, cancel = context.WithTimeout(context.TODO(), time.Second*2)
 	defer cancel()
 
-	podsList, err := clientSet.CoreV1().Pods(namespace).List(ctx, metav1.ListOptions{})
-	if err != nil {
-		global.TPLogger.Error("获取pod失败：", err)
-		return nil, errors.New("获取pod失败")
+	listOptions := metav1.ListOptions{
+		Limit: int64(pageSize),
 	}
-	for _, item := range podsList.Items {
-		fmt.Println(item.Name)
-	}
-	return podsList, nil
 
+	for {
+		pods, err := clientSet.CoreV1().Pods(namespace).List(ctx, listOptions)
+		if err != nil {
+			global.TPLogger.Error("获取pod失败：", err)
+			return nil, errors.New("获取pod失败")
+		}
+
+		allPods = append(allPods, pods.Items...)
+
+		if len(pods.Continue) == 0 || len(allPods) >= page*pageSize {
+			break
+		}
+
+		listOptions.Continue = pods.Continue
+	}
+
+	startIndex := (page - 1) * pageSize
+	endIndex := page * pageSize
+
+	if startIndex >= len(allPods) {
+		return []corev1.Pod{}, nil
+	}
+
+	if endIndex > len(allPods) {
+		endIndex = len(allPods)
+	}
+
+	return allPods[startIndex:endIndex], nil
 }
 
 func (k *k8sCluster) GetPod(cid string, namespace, name string) (ret interface{}, err error) {
@@ -88,11 +113,79 @@ func (i *k8sCluster) CreatePod(cid string, pod interface{}) (ret interface{}, er
 	if !ok {
 		// 类型断言失败，处理错误情况
 	}
-	fmt.Println(podPtr.Namespace)
+
 	ret, err = clientSet.CoreV1().Pods(podPtr.Namespace).Create(ctx, podPtr, metav1.CreateOptions{})
 	if err != nil {
 		global.TPLogger.Error("创建pod失败：", err)
 		return nil, errors.New("创建pod失败")
 	}
 	return ret, nil
+}
+
+func (i *k8sCluster) UpdatePod(cid string, patch interface{}) (ret interface{}, err error) {
+	clientSetAny, found := global.ClientSetCache.Get(cid)
+	if !found {
+		global.TPLogger.Error("当前集群不存在：", err)
+		return nil, errors.New("当前集群不存在")
+	}
+	clientSet := clientSetAny.(*kubernetes.Clientset)
+	// 获取config
+	var (
+		ctx    context.Context
+		cancel context.CancelFunc
+	)
+	ctx, cancel = context.WithTimeout(context.TODO(), time.Second*2)
+	defer cancel()
+
+	patchPtr, ok := patch.(*corev1.Pod)
+
+	targetPodName := patchPtr.Name
+	targetPodNamespace := patchPtr.Namespace
+
+	if !ok {
+		// 类型断言失败，处理错误情况
+	}
+
+	// originalPod, err := clientSet.CoreV1().Pods(targetPodNamespace).Get(ctx, targetPodName, metav1.GetOptions{})
+	// if err != nil {
+	// 	global.TPLogger.Error("获取原Pod信息失败：", err)
+	// 	return nil, errors.New("获取原Pod信息失败")
+	// }
+	patchBytes, err := json.Marshal(patchPtr)
+	if err != nil {
+		global.TPLogger.Error("updatePod.JsonMarshal.error:", err)
+		return nil, errors.New("更新pod失败")
+	}
+	ret, err = clientSet.CoreV1().Pods(targetPodNamespace).Patch(ctx, targetPodName, types.StrategicMergePatchType, patchBytes, metav1.PatchOptions{})
+	if err != nil {
+		global.TPLogger.Errorf("更新pod %s 失败：%v", targetPodName, err)
+		return nil, errors.New("更新pod失败")
+	}
+	return ret, nil
+}
+
+func (i *k8sCluster) DeletePod(cid, namespace string, pods []string) (ret interface{}, err error) {
+	clientSetAny, found := global.ClientSetCache.Get(cid)
+	if !found {
+		global.TPLogger.Error("当前集群不存在：", err)
+		return nil, errors.New("当前集群不存在")
+	}
+	clientSet := clientSetAny.(*kubernetes.Clientset)
+	// 获取config
+	var (
+		ctx    context.Context
+		cancel context.CancelFunc
+	)
+	ctx, cancel = context.WithTimeout(context.TODO(), time.Second*2)
+	defer cancel()
+
+	for _, pod := range pods {
+		err := clientSet.CoreV1().Pods(namespace).Delete(ctx, pod, metav1.DeleteOptions{})
+		global.TPLogger.Infof("删除Pod %s 成功。", pod)
+		if err != nil {
+			global.TPLogger.Errorf("删除pod %s 失败：%v", pod, err)
+			return nil, errors.New("删除pod " + pod + " 失败")
+		}
+	}
+	return "删除Pod任务完成", nil
 }

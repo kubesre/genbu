@@ -16,6 +16,8 @@ type InterfaceK8s interface {
 	GetPodList(cid string, namespace string, page, pageSize int) (ret interface{}, err error)
 	GetPod(cid string, namespace, name string) (ret interface{}, err error)
 	CreatePod(cid string, pod interface{}) (ret interface{}, err error)
+	UpdatePod(cid string, patch interface{}) (ret interface{}, err error)
+	DeletePod(cid, namespace string, pods []string) (ret interface{}, err error)
 	DeleteK8sCluster(id []string) error
 	UpdateK8sCluster(cluster *kubernetes.Configs) error
 	RefreshK8sCluster() error

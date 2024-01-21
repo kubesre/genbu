@@ -17,6 +17,9 @@ func InitPodRouters(r *gin.RouterGroup) gin.IRoutes {
 		r.GET("/pod/getPodList", kubernetes.GetPodList)
 		r.GET("/pod/getPod", kubernetes.GetPod)
 		r.POST("/pod/createPod", kubernetes.CreatePod)
+		r.DELETE("/pod/deletePod", kubernetes.DeletePod)
+		r.PUT("/pod/updatePod", kubernetes.UpdatePod)
+
 	}
 	return r
 }
