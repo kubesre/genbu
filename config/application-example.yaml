@@ -15,7 +15,7 @@ mysql:
   MaxIdleConns: 10
   MaxOpenConns: 100
   # 是否开启debug，1 开启 0 关闭
-  ActiveDebug: 1
+  ActiveDebug: 0
 
 jwt:
   realm: genbu
