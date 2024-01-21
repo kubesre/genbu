@@ -42,5 +42,22 @@ type ClusterK8sList struct {
 	Total int64      `json:"total"`
 }
 
+type ConfigMap struct {
+	Name      string `json:"name" form:"name" binding:"required"`
+	NameSpace string `json:"namespace" form:"namespace"`
+}
 
-type ConfigMap struct {}
+type ConfigMapDelete struct {
+	ConfigMapName []map[string]string `json:"configmap_name" form:"name" binding:"required"`
+	NameSpace     string              `json:"namespace" form:"namespace"`
+}
+
+type DeleteConfigMaps struct {
+	NameSpace string `json:"namespace" form:"namespace"`
+}
+
+type CreateConfigMap struct {
+	ConfigMapName string `json:"configmap_name" binding:"required"` // 这里的ConfigMapName表示的是通过kubectl get cm 查看出来的名称
+	Text          string `json:"text" binding:"required"`           // ConfigMap类容
+	NameSpace     string `json:"namespace"`                         // 命名空间的名称
+}
