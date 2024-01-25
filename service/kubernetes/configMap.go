@@ -88,13 +88,7 @@ func (k *k8sCluster) DeleteConfigs(cid, NameSpace string) (string, error) {
 		global.TPLogger.Error("当前集群不存在：", errors.New(""))
 		return "", errors.New("集群不存在")
 	}
-	// err = c.CoreV1().ConfigMaps(NameSpace).DeleteCollection(context.Background(), metav1.DeleteOptions{}, metav1.ListOptions{})
-	// if err != nil {
-	// 	global.TPLogger.Error("删除ConfigMaps失败：", err)
-	// 	return "", errors.New("ConfigMap删除失败")
-	// } else {
-	// 	return "删除成功", nil
-	// }
+
 	cml, err := c.CoreV1().ConfigMaps(NameSpace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
 		global.TPLogger.Error("删除ConfigMaps失败：", err)

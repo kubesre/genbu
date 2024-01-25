@@ -165,7 +165,4 @@ func UpdateConfigMap(ctx *gin.Context) {
 		return
 	}
 	global.ReturnContext(ctx).Successful("success", configMap)
-
 }
-
-// 历史版本

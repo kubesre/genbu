@@ -29,6 +29,10 @@ type InterfaceK8s interface {
 	UpdateConfigMap(cid, NameSpace, ConfigMapName, Text string) (*v1.ConfigMap, error)
 	ListK8sSecret(cid, NameSpace string) (*v1.SecretList, error)
 	CreateK8sSecret(cid, NameSpace, SecretName, Text string) (*v1.Secret, error)
+	GetK8sSecret(cid, NameSpace, Name string) (*v1.Secret, error)
+	DeleteK8sSecret(cid, NameSpace string, ConfigMapName []map[string]string) error
+	DeleteK8sSecrets(cid, NameSpace string) error
+	UpdateK8sSecret(cid, NameSpace, SecretName, Text string) (*v1.Secret, error)
 }
 
 type k8sCluster struct{}
