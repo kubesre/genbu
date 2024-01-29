@@ -11,7 +11,6 @@ import (
 	"context"
 	"errors"
 	"genbu/common/global"
-	"genbu/domain"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -20,7 +19,12 @@ import (
 
 // 获取node节点信息
 
-func (k *k8sCluster) GetK8sClusterNodeList(cid string, name string, page, limit int) (nodeResp *domain.NodesResp, err error) {
+type NodesResp struct {
+	Items []corev1.Node `json:"items"`
+	Total int           `json:"total"`
+}
+
+func (k *k8sCluster) GetK8sClusterNodeList(cid string, name string, page, limit int) (nodeResp *NodesResp, err error) {
 	clientSetAny, found := global.ClientSetCache.Get(cid)
 	if !found {
 		global.TPLogger.Error("当前集群不存在：", err)
@@ -56,7 +60,7 @@ func (k *k8sCluster) GetK8sClusterNodeList(cid string, name string, page, limit 
 	data := filtered.Sort().Paginate()
 	nodes := k.fromCells(data.GenericDataList)
 
-	return &domain.NodesResp{
+	return &NodesResp{
 		Items: nodes,
 		Total: total,
 	}, nil
