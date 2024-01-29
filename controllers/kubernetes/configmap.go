@@ -56,6 +56,7 @@ func CreateConfigMap(ctx *gin.Context) {
 
 }
 
+// ConfigMap列表
 func ListK8sConfigMap(ctx *gin.Context) {
 	cid := ctx.Param("cid")
 	namespace := ctx.DefaultQuery("namespace", "default")
