@@ -154,3 +154,14 @@ func FromCells(cells []DataCell) []corev1.Pod {
 	}
 	return pods
 }
+
+// node
+type nodeCell corev1.Node
+
+func (p nodeCell) GetCreation() time.Time {
+	return p.CreationTimestamp.Time
+}
+
+func (p nodeCell) GetName() string {
+	return p.Name
+}
