@@ -112,7 +112,7 @@ func (d *DataSelector) Paginate() *DataSelector {
 	}
 	// 定义取出方位需要的start index 和end index
 	startIndex := limit * (page - 1)
-	endIndex := limit*page - 1
+	endIndex := limit * page
 
 	// 处理endIndex
 	if endIndex > len(d.GenericDataList) {
