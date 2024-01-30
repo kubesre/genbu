@@ -8,6 +8,7 @@
 package middles
 
 import (
+	"fmt"
 	"genbu/common/global"
 	"genbu/dao/kubernetes"
 	"genbu/utils"
@@ -21,6 +22,8 @@ import (
 func K8sClientCache() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 获取请求路径
+		fmt.Println("缓存中间件路径：", c.Request.RequestURI)
+
 		path := strings.Split(c.Request.RequestURI, "?")[0]
 		if !strings.Contains(path, "cluster") {
 			global.TPLogger.Error("请求失败")
