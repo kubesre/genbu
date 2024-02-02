@@ -8,9 +8,10 @@
 package global
 
 import (
+	"os"
+
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
-	"os"
 )
 
 // 初始化配置文件
