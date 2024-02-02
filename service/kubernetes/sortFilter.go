@@ -112,7 +112,7 @@ func (d *DataSelector) Paginate() *DataSelector {
 	}
 	// 定义取出方位需要的start index 和end index
 	startIndex := limit * (page - 1)
-	endIndex := limit*page - 1
+	endIndex := limit * page
 
 	// 处理endIndex
 	if endIndex > len(d.GenericDataList) {
@@ -153,4 +153,15 @@ func FromCells(cells []DataCell) []corev1.Pod {
 		pods[i] = corev1.Pod(cells[i].(podCell))
 	}
 	return pods
+}
+
+// node
+type nodeCell corev1.Node
+
+func (p nodeCell) GetCreation() time.Time {
+	return p.CreationTimestamp.Time
+}
+
+func (p nodeCell) GetName() string {
+	return p.Name
 }
