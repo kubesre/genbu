@@ -14,9 +14,8 @@ import (
 	"genbu/routers/base"
 	"genbu/routers/kubernetes"
 	system "genbu/routers/system"
-	"time"
-
 	"github.com/gin-gonic/gin"
+	"time"
 )
 
 func BaseRouters() *gin.Engine {
@@ -69,6 +68,7 @@ func BaseRouters() *gin.Engine {
 		kubernetes.InitConfigRouters(PrivateGroup)
 		kubernetes.InitNodeRouters(PrivateGroup)
 		kubernetes.InitSecretRouters(PrivateGroup)
+		kubernetes.InitStatefulSetRouters(PrivateGroup)
 	}
 	r.NoRoute(func(ctx *gin.Context) {
 		global.ReturnContext(ctx).Failed("fail", "该接口未开放")

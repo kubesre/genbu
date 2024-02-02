@@ -8,7 +8,9 @@
 package kubernetes
 
 import (
+	"genbu/common/global"
 	"genbu/models/kubernetes"
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 )
@@ -33,6 +35,13 @@ type InterfaceK8s interface {
 	DeleteK8sSecret(cid, NameSpace string, ConfigMapName []map[string]string) error
 	DeleteK8sSecrets(cid, NameSpace string) error
 	UpdateK8sSecret(cid, NameSpace, SecretName, Text string) (*v1.Secret, error)
+	CreateStatefulSetYaml(cid, content string) (err error)
+	UpdateStatefulSetYaml(cid, content string) (err error)
+	GetStatefulSetList(cid, namespace, filterName string, limit, page int) (statefulSetsResp *global.StatusfulSetsResp, err error)
+	GetStatefulSetDetail(cid, name, namespace string) (statefulSet *appsv1.StatefulSet, err error)
+	DeleteStatefulSet(cid, name, namespace string) (err error)
+	StatefulSetToCells(std []global.StatefulSetData) []DataCell
+	StatefulSetFromCells(cells []DataCell) []global.StatefulSetData
 }
 
 type k8sCluster struct{}

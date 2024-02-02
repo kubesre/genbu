@@ -8,6 +8,7 @@
 package kubernetes
 
 import (
+	"genbu/common/global"
 	corev1 "k8s.io/api/core/v1"
 	"sort"
 	"strings"
@@ -153,6 +154,16 @@ func FromCells(cells []DataCell) []corev1.Pod {
 		pods[i] = corev1.Pod(cells[i].(podCell))
 	}
 	return pods
+}
+
+// statefulSet资源格式化
+type statefulSetCell global.StatefulSetData
+
+func (s statefulSetCell) GetCreation() time.Time {
+	return s.CreationTimestamp
+}
+func (s statefulSetCell) GetName() string {
+	return s.Name
 }
 
 // node
