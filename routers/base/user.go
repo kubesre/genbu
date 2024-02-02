@@ -16,7 +16,7 @@ import (
 
 func InitBaseRouters(r *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) gin.IRoutes {
 	{
-		r.POST("/base/user/login", authMiddleware.LoginHandler) // 登录
+		r.POST("/base/login", authMiddleware.LoginHandler) // 登录
 	}
 	return r
 }
