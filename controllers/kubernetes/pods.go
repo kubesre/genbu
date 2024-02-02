@@ -72,7 +72,6 @@ func UpdatePod(c *gin.Context) {
 	clusterID := c.Param("cid")
 	var myPatch MyPod
 	err := c.ShouldBindJSON(&myPatch)
-	fmt.Println(myPatch)
 	ret, err := service.NewK8sInterface().UpdatePod(clusterID, &myPatch)
 	if err != nil {
 		global.ReturnContext(c).Failed("更新Pod失败", err.Error())

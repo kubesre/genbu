@@ -95,7 +95,6 @@ func (k *k8sCluster) GetPod(cid string, namespace, name string) (ret interface{}
 		global.TPLogger.Error("获取pod失败：", err)
 		return nil, errors.New("获取pod失败")
 	}
-	fmt.Println(pod.Name, pod.Namespace)
 	return pod, nil
 
 }
@@ -179,16 +178,18 @@ func (k *k8sCluster) DeletePod(cid, namespace string, pods []string) (ret interf
 	)
 	ctx, cancel = context.WithTimeout(context.TODO(), time.Second*2)
 	defer cancel()
-
+	var success_list []string
 	for _, pod := range pods {
 		err := clientSet.CoreV1().Pods(namespace).Delete(ctx, pod, metav1.DeleteOptions{})
-		global.TPLogger.Infof("删除Pod %s 成功。", pod)
 		if err != nil {
 			global.TPLogger.Errorf("删除pod %s 失败：%v", pod, err)
-			return nil, errors.New("删除pod " + pod + " 失败")
+			return nil, errors.New("删除pod " + pod + " 失败,原因：" + err.Error())
 		}
+		global.TPLogger.Infof("删除Pod %s 成功。", pod)
+		success_list = append(success_list, pod)
+
 	}
-	return "删除Pod任务完成", nil
+	return fmt.Sprintf("删除Pod %s 完成", success_list), nil
 }
 
 func (k *k8sCluster) GetPodLogs(cid, namespace, name string, follow bool) (ret interface{}, err error) {
