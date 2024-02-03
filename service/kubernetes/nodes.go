@@ -11,9 +11,9 @@ import (
 	"context"
 	"errors"
 	"genbu/common/global"
+	"genbu/utils"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 	"time"
 )
 
@@ -25,12 +25,12 @@ type NodesResp struct {
 }
 
 func (k *k8sCluster) GetK8sClusterNodeList(cid string, name string, page, limit int) (nodeResp *NodesResp, err error) {
-	clientSetAny, found := global.ClientSetCache.Get(cid)
-	if !found {
-		global.TPLogger.Error("当前集群不存在：", err)
-		return nil, errors.New("当前集群不存在")
+	clientSet, err := utils.GetCache(cid)
+	if err != nil {
+		global.TPLogger.Error("Node管理模块获取节点:", errors.New("当前集群不存在"))
+		// return nil, errors.New("当前集群不存在")
+		return nil, err
 	}
-	clientSet := clientSetAny.(*kubernetes.Clientset)
 	// 获取config
 	var (
 		ctx    context.Context
@@ -67,12 +67,12 @@ func (k *k8sCluster) GetK8sClusterNodeList(cid string, name string, page, limit 
 }
 
 func (k *k8sCluster) GetK8sClusterNodeDetail(cid string, name string) (node *corev1.Node, err error) {
-	clientSetAny, found := global.ClientSetCache.Get(cid)
-	if !found {
-		global.TPLogger.Error("当前集群不存在：", err)
-		return nil, errors.New("当前集群不存在")
+	clientSet, err := utils.GetCache(cid)
+	if err != nil {
+		global.TPLogger.Error("Node管理模块节点详情:", errors.New("当前集群不存在"))
+		// return nil, errors.New("当前集群不存在")
+		return nil, err
 	}
-	clientSet := clientSetAny.(*kubernetes.Clientset)
 	// 获取config
 	var (
 		ctx    context.Context
