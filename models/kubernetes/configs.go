@@ -51,3 +51,13 @@ type CreateConfigMap struct {
 	Text          string `json:"text" binding:"required"`           // ConfigMap类容
 	NameSpace     string `json:"namespace"`                         // 命名空间的名称
 }
+
+type NameSpace struct {
+	NameSpace string `json:"name" binding:"required"`
+}
+type UpdateNameSpace struct {
+	NameSpaceName string `json:"name" binding:"required"`
+	//Status        string `json:"status" `
+	Annotations string `json:"annotations"`
+	Labels      string `json:"labels"`
+}
