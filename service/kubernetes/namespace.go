@@ -2,6 +2,7 @@ package kubernetes
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"genbu/common/global"
 	corev1 "k8s.io/api/core/v1"
@@ -88,4 +89,47 @@ func (k *k8sCluster) DeleteNamespace(cid, namespace string) (string, error) {
 	}
 
 	return "namespace删除成功", nil
+}
+
+// 更新ns
+func (k *k8sCluster) UpdateNamespace(cid, NameSpaceName, Annotations, Labels string) (*corev1.Namespace, error) {
+	clientSetAny, found := global.ClientSetCache.Get(cid)
+
+	if !found {
+		global.TPLogger.Error("当前集群不存在：", errors.New(""))
+		return nil, errors.New("当前集群不存在")
+	}
+	clientSet := clientSetAny.(*kubernetes.Clientset)
+	namespace := &corev1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: NameSpaceName,
+		},
+	}
+	//if Status != "" {
+	//	namespace.Status.Phase = corev1.NamespacePhase(Status)
+	//}
+	if Annotations != "" {
+		if namespace.Annotations == nil {
+			namespace.Annotations = make(map[string]string)
+		}
+		namespace.Annotations["annotations"] = Annotations
+	}
+	if Labels != "" {
+		if namespace.Labels == nil {
+			namespace.Labels = make(map[string]string)
+		}
+		namespace.Labels["labels"] = Labels
+	}
+	_, err := json.Marshal(namespace)
+	if err != nil {
+		global.TPLogger.Error("解析失败", err.Error())
+		return nil, errors.New("解析失败")
+	}
+	update, err := clientSet.CoreV1().Namespaces().Update(context.Background(), namespace, metav1.UpdateOptions{})
+	if err != nil {
+		global.TPLogger.Error("namespace更新失败: ", err)
+		return nil, errors.New("namespace更新失败")
+	} else {
+		return update, nil
+	}
 }

@@ -56,3 +56,20 @@ func DeleteNamespace(ctx *gin.Context) {
 	}
 	global.ReturnContext(ctx).Successful("success", s)
 }
+
+// 更新ns
+func UpdateNamespace(ctx *gin.Context) {
+	params := new(mod.UpdateNameSpace)
+	cid := ctx.Param("cid")
+	if err := ctx.ShouldBindJSON(&params); err != nil {
+		global.ReturnContext(ctx).Failed("failed", "请传入必填参数name")
+		return
+	}
+	ns, err := service.NewK8sInterface().UpdateNamespace(cid, params.NameSpaceName, params.Annotations, params.Labels)
+	if err != nil {
+		global.ReturnContext(ctx).Failed("failed", err.Error())
+		return
+	}
+	global.ReturnContext(ctx).Successful("success", ns)
+
+}

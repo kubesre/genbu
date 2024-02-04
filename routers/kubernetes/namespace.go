@@ -11,6 +11,7 @@ func InitNameSpaceRouters(r *gin.RouterGroup) gin.IRoutes {
 		r.GET("/namespace/getNameSpaceList", kubernetes.GetK8sNameSpaceList)
 		r.POST("/namespace/createNameSpace", kubernetes.CreateK8sNameSpace)
 		r.POST("/namespace/deleteNameSpace", kubernetes.DeleteNamespace)
+		r.POST("/namespace/updateNameSpace", kubernetes.UpdateNamespace)
 
 	}
 	return r

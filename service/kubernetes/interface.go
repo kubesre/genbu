@@ -36,6 +36,7 @@ type InterfaceK8s interface {
 	GetK8sNameSpaceList(cid string) ([]map[string]interface{}, error)
 	CreateK8sNameSpace(cid, Namespace string) (*corev1.Namespace, error)
 	DeleteNamespace(cid, Namespace string) (string, error)
+	UpdateNamespace(cid, NameSpaceName, Annotations, Labels string) (*v1.Namespace, error)
 }
 
 type k8sCluster struct{}
