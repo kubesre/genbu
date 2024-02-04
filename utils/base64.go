@@ -21,3 +21,9 @@ func DecodeBase64(source string) (dest string, err error) {
 	dest = string(destByte)
 	return dest, nil
 }
+
+// base64加密
+func EncodeBase64(source []byte) (dest string) {
+	toString := base64.StdEncoding.EncodeToString(source)
+	return toString
+}
