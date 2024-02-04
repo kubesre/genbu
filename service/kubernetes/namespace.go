@@ -64,3 +64,21 @@ func (k *k8sCluster) CreateK8sNameSpace(cid, Namespace string) (*corev1.Namespac
 	}
 
 }
+
+// 删除ns
+func (k *k8sCluster) DeleteNamespace(cid, namespace string) (string, error) {
+	clientSetAny, found := global.ClientSetCache.Get(cid)
+	if !found {
+		global.TPLogger.Error("当前集群不存在：", errors.New(""))
+		return "", errors.New("当前集群不存在")
+	}
+	clientSet := clientSetAny.(*kubernetes.Clientset)
+	//err = clientSet.CoreV1().Namespaces().Delete(context.Background(), namespace, metav1.DeleteOptions{})
+	err := clientSet.CoreV1().Namespaces().Delete(context.Background(), namespace, metav1.DeleteOptions{})
+	if err != nil {
+		global.TPLogger.Error("删除Namespace:%s失败：", namespace, err)
+		return "", errors.New("Namespace删除失败")
+	}
+
+	return "namespace删除成功", nil
+}

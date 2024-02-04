@@ -35,6 +35,7 @@ type InterfaceK8s interface {
 	UpdateK8sSecret(cid, NameSpace, SecretName, Text string) (*v1.Secret, error)
 	GetK8sNameSpaceList(cid string) (err error)
 	CreateK8sNameSpace(cid, Namespace string) (*corev1.Namespace, error)
+	DeleteNamespace(cid, Namespace string) (string, error)
 }
 
 type k8sCluster struct{}
