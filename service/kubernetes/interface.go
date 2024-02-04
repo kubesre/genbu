@@ -33,7 +33,7 @@ type InterfaceK8s interface {
 	DeleteK8sSecret(cid, NameSpace string, ConfigMapName []map[string]string) error
 	DeleteK8sSecrets(cid, NameSpace string) error
 	UpdateK8sSecret(cid, NameSpace, SecretName, Text string) (*v1.Secret, error)
-	GetK8sNameSpaceList(cid string) (err error)
+	GetK8sNameSpaceList(cid string) ([]map[string]interface{}, error)
 	CreateK8sNameSpace(cid, Namespace string) (*corev1.Namespace, error)
 	DeleteNamespace(cid, Namespace string) (string, error)
 }

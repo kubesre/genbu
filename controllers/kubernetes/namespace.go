@@ -11,13 +11,13 @@ import (
 // 获取命名空间
 func GetK8sNameSpaceList(ctx *gin.Context) {
 	clusterID := ctx.Param("cid")
-	err := service.NewK8sInterface().GetK8sNameSpaceList(clusterID)
+	res, err := service.NewK8sInterface().GetK8sNameSpaceList(clusterID)
 	if err != nil {
 		global.ReturnContext(ctx).Failed("failed", err.Error())
 		return
 	}
 	//global.ReturnContext(ctx).Failed("failed", err.Error())
-	global.ReturnContext(ctx).Successful("success", "success")
+	global.ReturnContext(ctx).Successful("success", res)
 }
 
 // 创建命名空间

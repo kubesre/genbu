@@ -3,7 +3,6 @@ package kubernetes
 import (
 	"context"
 	"errors"
-	"fmt"
 	"genbu/common/global"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -16,11 +15,11 @@ type CreateNamespaceRequest struct {
 }
 
 // 获取ns信息
-func (k *k8sCluster) GetK8sNameSpaceList(cid string) (err error) {
+func (k *k8sCluster) GetK8sNameSpaceList(cid string) (restful []map[string]interface{}, err error) {
 	clientSetAny, found := global.ClientSetCache.Get(cid)
 	if !found {
 		global.TPLogger.Error("当前集群不存在：", err)
-		return errors.New("当前集群不存在")
+		return nil, errors.New("当前集群不存在")
 	}
 	clientSet := clientSetAny.(*kubernetes.Clientset)
 	// 获取config
@@ -36,12 +35,25 @@ func (k *k8sCluster) GetK8sNameSpaceList(cid string) (err error) {
 	if err != nil {
 
 		global.TPLogger.Error("获取namespace失败：", err)
-		return errors.New("获取namespace失败")
+		return nil, errors.New("获取namespace失败")
 	}
+	//for _, item := range nameSpaceList.Items {
+	//	fmt.Println(item.Name)
+	//}
+	restful = []map[string]interface{}{}
 	for _, item := range nameSpaceList.Items {
-		fmt.Println(item.Name)
+		restful = append(restful, map[string]interface{}{
+			"name":            item.Name,
+			"api_version":     item.APIVersion,
+			"resourceVersion": item.ResourceVersion,
+			"kind":            item.Kind,
+			//"namespace":       item.Namespace,
+			"create_time": item.CreationTimestamp.Format(time.DateTime), // 格式化成：2006-01-02 15:04:05
+			"labels":      item.Labels,
+			"status":      item.Status.Phase,
+		})
 	}
-	return nil
+	return restful, nil
 
 }
 
