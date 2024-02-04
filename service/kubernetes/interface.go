@@ -9,6 +9,7 @@ package kubernetes
 
 import (
 	"genbu/models/kubernetes"
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 )
@@ -33,6 +34,12 @@ type InterfaceK8s interface {
 	DeleteK8sSecret(cid, NameSpace string, ConfigMapName []map[string]string) error
 	DeleteK8sSecrets(cid, NameSpace string) error
 	UpdateK8sSecret(cid, NameSpace, SecretName, Text string) (*v1.Secret, error)
+	GetDeploymentList(cid, NameSpace string, page, limit int) (*DeployResp, error)
+	GetDeploymentDetails(cid, Namespace, name string) (*appsv1.Deployment, error)
+	DeleteDeployment(cid, Namespace, name string) (err error)
+	GetDeploymentYaml(cid, Namespace, name string) (string, error)
+	CreateOrUpdateDeployment2Yaml(cid, name string) (string, error)
+	CreateOrUpdateDeployment2Arg(cid, namespace, deploymentName, containersName, image, lableKey, lableValue string, replicas int32) (string, error)
 }
 
 type k8sCluster struct{}
