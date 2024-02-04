@@ -69,6 +69,7 @@ func BaseRouters() *gin.Engine {
 		kubernetes.InitConfigRouters(PrivateGroup)
 		kubernetes.InitNodeRouters(PrivateGroup)
 		kubernetes.InitSecretRouters(PrivateGroup)
+		kubernetes.InitNameSpaceRouters(PrivateGroup)
 	}
 	r.NoRoute(func(ctx *gin.Context) {
 		global.ReturnContext(ctx).Failed("fail", "该接口未开放")

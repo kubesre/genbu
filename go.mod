@@ -1,6 +1,8 @@
 module genbu
 
-go 1.17
+go 1.21
+
+toolchain go1.21.3
 
 require (
 	github.com/appleboy/gin-jwt/v2 v2.9.1
