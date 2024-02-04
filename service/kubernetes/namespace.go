@@ -10,10 +10,6 @@ import (
 	"time"
 )
 
-type CreateNamespaceRequest struct {
-	NamespaceName string `json:"namespaceName"`
-}
-
 // 获取ns信息
 func (k *k8sCluster) GetK8sNameSpaceList(cid string) (restful []map[string]interface{}, err error) {
 	clientSetAny, found := global.ClientSetCache.Get(cid)
@@ -85,7 +81,6 @@ func (k *k8sCluster) DeleteNamespace(cid, namespace string) (string, error) {
 		return "", errors.New("当前集群不存在")
 	}
 	clientSet := clientSetAny.(*kubernetes.Clientset)
-	//err = clientSet.CoreV1().Namespaces().Delete(context.Background(), namespace, metav1.DeleteOptions{})
 	err := clientSet.CoreV1().Namespaces().Delete(context.Background(), namespace, metav1.DeleteOptions{})
 	if err != nil {
 		global.TPLogger.Error("删除Namespace:%s失败：", namespace, err)
