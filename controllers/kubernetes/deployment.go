@@ -25,6 +25,12 @@ func GetDeploymentList(ctx *gin.Context) {
 		global.ReturnContext(ctx).Failed("绑定参数失败", err.Error())
 		return
 	}
+	if params.Page == 0 {
+		params.Page = 1
+	}
+	if params.Limit == 0 {
+		params.Limit = 10
+	}
 	data, err := service.NewK8sInterface().GetDeploymentList(clusterID, ctx.Query("namespace"), params.Page, params.Limit)
 	if err != nil {
 		global.ReturnContext(ctx).Failed("failed", err.Error())
